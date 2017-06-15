@@ -79,11 +79,11 @@ function draw() {
 
   // comment these out if you don't want the graph
   fill(128,128,255);
-  rect(width-74,height-80,10,0-(bass*0.25));
+  rect(width-49,height-80,10,0-(bass*0.25));
   fill(128,255,128);
-  rect(width-47,height-80,10,0-(mid*0.25));
+  rect(width-37,height-80,10,0-(mid*0.25));
   fill(255,128,128);
-  rect(width-20,height-80,10,0-(treble*0.25));
+  rect(width-25,height-80,10,0-(treble*0.25));
   fill(255,255,255)
     
   var reached = [];
