@@ -1,14 +1,17 @@
-var vertices = [];
 var mic;
 var fft;
 //var frequencySpectrum = [];
 
-
 var instructions = ["left", "right", "up", "down", 
-                           "1", "2", "3",
-                           "loop", "if"];
+                    "1", "2", "3",
+                    "loop", "if"
+		   ];
 
-
+var vertices = [];
+var words = [];
+var bands = [];
+var bandTypes = ['bass','mid','treble'];
+var directions = []
 
 function setup() {
   createCanvas(640, 640);
@@ -17,27 +20,76 @@ function setup() {
   mic.start();
   fft = new p5.FFT(0,256);
   fft.setInput(mic);
+
+  for (var i = 0; i < 12; i++) { 
+    var v = createVector(random(width), random(height));
+    vertices.push(v);
+    words.push(random(instructions));
+    bands.push(random(bandTypes));
+    directions.push(random(TAU));
+  }
 }
 
 function draw() {
   background(51);
-
   var spectrum = fft.analyze();
-  console.log(spectrum.length);
 
-  
+  var bass = fft.getEnergy("bass");
+  var mid = fft.getEnergy("mid");
+  var treble = fft.getEnergy("treble");
 
-  for (var i = 0; i < spectrum.length; i++) { 
-    var v = createVector(i*100+100, random(height));
-    vertices.push(v);
-  }
-
-
+  // comment these out if you don't want the graph
+  rect(width-50,height-40,10,0-bass);
+  rect(width-35,height-40,10,0-mid);
+  rect(width-20,height-40,10,0-treble);
+    
   var reached = [];
   var unreached = [];
 
   for (var i = 0; i < vertices.length; i++) {
-    unreached.push(vertices[i]);
+      var x = vertices[i].x;
+      var y = vertices[i].y;
+      var angle = directions[i];
+      
+      var energy = 0;
+
+      switch (bands[i]) {
+      case "bass":
+	  energy = bass;
+	  break;
+      case "mid":
+	  energy = mid;
+	  break;
+      case "treble":
+	  energy = treble;
+	  break;
+      }
+      // console.log("energy " + energy);
+      var ox = cos(angle) * (energy/50);
+      var oy = sin(angle) * (energy/50);
+      var x = vertices[i].x + ox;
+      var y = vertices[i].y + oy;
+      directions[i] += (0.05 - random(0.1));
+
+      if (x < 0) {
+	  x = 0 - x;
+	  directions[i] += 0 - directions[i];
+      }
+      if (x >= width) {
+	  x = width - (x - width);
+	  directions[i] += PI - directions[i];
+      }
+      if (y < 0) {
+	  y = 0 - y;
+	  directions[i] += HALF_PI - directions[i];
+      }
+      if (y >= height) {
+	  y = height - (y -height);
+	  directions[i] += (PI * 1.5) - directions[i];
+      }
+      vertices[i].x = x;
+      vertices[i].y = y;
+      unreached.push(vertices[i]);
   }
 
   reached.push(unreached[0]);
@@ -69,9 +121,10 @@ function draw() {
   for (var i = 0; i < vertices.length; i++) {
     fill(255);
     stroke(255);
-    ellipse(vertices[i].x, vertices[i].y, 16, 16);
+    ellipse(vertices[i].x, vertices[i].y, 10, 10);
     stroke(0);
-    text(random(instructions), vertices[i].x, vertices[i].y, 16, 16)
+    textSize(20);
+      text(words[i], vertices[i].x, vertices[i].y,20,20)
   }
 
 }
