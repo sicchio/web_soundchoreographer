@@ -16,8 +16,8 @@ var sine = []
 // five minutes
 var duration = 6 * 60 * 1000
 
-var maxVertices = 25
-var minVertices = 3
+var maxVertices = 35
+var minVertices = 1
 
 function addWord() {
     var v = createVector(random(width), random(height));
@@ -42,7 +42,7 @@ function setup() {
   fft = new p5.FFT(0,256);
   fft.setInput(mic);
 
-  for (var i = 0; i < 12; i++) {
+  for (var i = 0; i < minVertices; i++) {
 	addWord()
   }
 
